@@ -33,7 +33,7 @@ public class CSVReader {
 
 
         currentWriter = generateUTF8Writer(new File(RISK_STATUS_DICTIONARY_FILE_PATH_SQL));
-        generateClient(readFile(new FileReader(CLIENT_FILE_PATH_CSV)), currentWriter);
+        generateRiskStatusDictionary(readFile(new FileReader(RISK_STATUS_DICTIONARY_FILE_PATH_CSV)), currentWriter);
         currentWriter.flush();
 
         currentWriter.close();
@@ -89,6 +89,39 @@ public class CSVReader {
                             + "'" + row[10] + "'";
                 }
                 insert = "Insert into Client (" + header + ")" + " values (" + body + ")";
+                System.out.println(insert);
+                writer.write(insert + ";\n");
+            }
+            status = "\n\n\nOk\n\n";
+
+        } else {
+            status = "\n\n\nчто-то пошло не так\n\n\n";
+        }
+
+        System.out.println(status);
+    }
+    public void generateRiskStatusDictionary(List<List<String>> records, Writer writer) throws IOException {
+        String insert = "";
+        String header = "";
+        String body = "";
+        String status = "";
+
+        if (records.size() > 0) {
+            for (int i = 1; i < records.size(); i++) {
+                for (String s : records.get(0)) {
+                    header = s.replace(";", ",");
+                }
+                for (String s2 : records.get(i)) {
+                    String[] row;
+                    row = s2.split(";");
+                    body = "'" + row[0] + "',"
+                            + (row[1].equals("") ? "''," : "to_timestamp('" + row[1] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + (row[2].equals("") ? "''," : "to_timestamp('" + row[2] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + "'" + row[3] + "',"
+                            + "'" + row[4] + "'"
+                            ;
+                }
+                insert = "Insert into RISK_STATUS_DICTIONARY (" + header + ")" + " values (" + body + ")";
                 System.out.println(insert);
                 writer.write(insert + ";\n");
             }
