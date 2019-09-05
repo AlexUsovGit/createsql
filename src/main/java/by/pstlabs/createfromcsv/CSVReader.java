@@ -22,6 +22,12 @@ public class CSVReader {
     private static final String INDICATOR_DICTIONARY_CSV = "indicator_dictionary_insert_template.csv";
     private static final String INDICATOR_DICTIONARY_SQL = "insert-into-INDICATOR_DICTIONARY.sql";
 
+    private static final String REGULATION_DICTIONARY_CSV = "indicator_dictionary_insert_template.csv";
+    private static final String REGULATION_DICTIONARY_SQL = "insert-into-INDICATOR_DICTIONARY.sql";
+
+
+    //REGULATION_DICTIONARY
+
     File fileDir;
     Writer currentWriter;
     String header = "";
@@ -72,16 +78,22 @@ public class CSVReader {
         return records;
     }
 
-    public void generateClient(List<List<String>> records, Writer writer) throws IOException {
+    public String generateHeader(List<List<String>> records) {
         header = "";
+        if (records.size() > 0) {
+            for (String s : records.get(0)) {
+                header = (s.replace(";", ",")).replace("\uFEFF", "");
+            }
+        }
+        return header;
+    }
+
+    public void generateClient(List<List<String>> records, Writer writer) throws IOException {
         body = "";
         insert = "";
 
         if (records.size() > 0) {
             for (int i = 1; i < records.size(); i++) {
-                for (String s : records.get(0)) {
-                    header = (s.replace(";", ",")).replace("\uFEFF", "");
-                }
                 for (String s2 : records.get(i)) {
                     String[] row;
                     row = s2.split(";");
@@ -97,28 +109,24 @@ public class CSVReader {
                             + "'" + row[9] + "',"
                             + "'" + row[10] + "'";
                 }
-                insert = "Insert into Client (" + header + ")" + " values (" + body + ")";
+                insert = "Insert into Client (" + generateHeader(records) + ")" + " values (" + body + ")";
                 System.out.println(insert);
                 writer.write(insert + ";\n");
             }
-            status = "\n\n\nOk\n\n";
+            status = "\nOk\n";
 
         } else {
-            status = "\n\n\nчто-то пошло не так\n\n\n";
+            status = "\nчто-то пошло не так\n";
         }
 
         System.out.println(status);
     }
 
     public void generateRiskStatusDictionary(List<List<String>> records, Writer writer) throws IOException {
-        header = "";
         body = "";
         insert = "";
         if (records.size() > 0) {
             for (int i = 1; i < records.size(); i++) {
-                for (String s : records.get(0)) {
-                    header = (s.replace(";", ",")).replace("\uFEFF", "");
-                }
                 for (String s2 : records.get(i)) {
                     String[] row;
                     row = s2.split(";");
@@ -129,7 +137,7 @@ public class CSVReader {
                             + "'" + row[4] + "'"
                     ;
                 }
-                insert = "Insert into RISK_STATUS_DICTIONARY (" + header + ")" + " values (" + body + ")";
+                insert = "Insert into RISK_STATUS_DICTIONARY (" + generateHeader(records) + ")" + " values (" + body + ")";
                 System.out.println(insert);
                 writer.write(insert + ";\n");
             }
@@ -143,14 +151,11 @@ public class CSVReader {
     }
 
     public void generateIndicatorDictionary(List<List<String>> records, Writer writer) throws IOException {
-        header = "";
+
         body = "";
         insert = "";
         if (records.size() > 0) {
             for (int i = 1; i < records.size(); i++) {
-                for (String s : records.get(0)) {
-                    header = (s.replace(";", ",")).replace("\uFEFF", "");
-                }
                 for (String s2 : records.get(i)) {
                     String[] row;
                     row = s2.split(";");
@@ -159,7 +164,7 @@ public class CSVReader {
                             + (row[2].equals("") ? "''," : "to_timestamp('" + row[2] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
                             + "'" + row[3] + "'";
                 }
-                insert = "Insert into INDICATOR_DICTIONARY (" + header + ")" + " values (" + body + ")";
+                insert = "Insert into INDICATOR_DICTIONARY (" + generateHeader(records) + ")" + " values (" + body + ")";
                 System.out.println(insert);
                 writer.write(insert + ";\n");
             }
