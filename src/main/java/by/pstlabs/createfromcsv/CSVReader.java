@@ -22,8 +22,12 @@ public class CSVReader {
     private static final String INDICATOR_DICTIONARY_CSV = "indicator_dictionary_insert_template.csv";
     private static final String INDICATOR_DICTIONARY_SQL = "insert-into-INDICATOR_DICTIONARY.sql";
 
-    private static final String REGULATION_DICTIONARY_CSV = "indicator_dictionary_insert_template.csv";
-    private static final String REGULATION_DICTIONARY_SQL = "insert-into-INDICATOR_DICTIONARY.sql";
+    private static final String REGULATION_DICTIONARY_CSV = "regulation_dictionary_insert_template.csv";
+    private static final String REGULATION_DICTIONARY_SQL = "insert-into-REGULATION_DICTIONARY.sql";
+
+
+    private static final String TASK_DICTIONARY_CSV = "task_dictionary_insert_template.csv";
+    private static final String TASK_DICTIONARY_SQL = "insert-into-TASK_DICTIONARY.sql";
 
 
     //REGULATION_DICTIONARY
@@ -50,6 +54,14 @@ public class CSVReader {
 
         currentWriter = generateUTF8Writer(new File(INDICATOR_DICTIONARY_SQL));
         generateIndicatorDictionary(readFile(new FileReader(INDICATOR_DICTIONARY_CSV)), currentWriter);
+        currentWriter.flush();
+
+        currentWriter = generateUTF8Writer(new File(REGULATION_DICTIONARY_SQL));
+        generateRegulationDictionary(readFile(new FileReader(REGULATION_DICTIONARY_CSV)), currentWriter);
+        currentWriter.flush();
+
+        currentWriter = generateUTF8Writer(new File(TASK_DICTIONARY_SQL));
+        generateTaskDictionary(readFile(new FileReader(TASK_DICTIONARY_CSV)), currentWriter);
         currentWriter.flush();
 
         currentWriter.close();
@@ -165,6 +177,61 @@ public class CSVReader {
                             + "'" + row[3] + "'";
                 }
                 insert = "Insert into INDICATOR_DICTIONARY (" + generateHeader(records) + ")" + " values (" + body + ")";
+                System.out.println(insert);
+                writer.write(insert + ";\n");
+            }
+            status = "\n\n\nOk\n\n";
+
+        } else {
+            status = "\n\n\nчто-то пошло не так\n\n\n";
+        }
+
+        System.out.println(status);
+    }
+
+    public void generateRegulationDictionary(List<List<String>> records, Writer writer) throws IOException {
+        body = "";
+        insert = "";
+
+        if (records.size() > 0) {
+            for (int i = 1; i < records.size(); i++) {
+                for (String s2 : records.get(i)) {
+                    String[] row;
+                    row = s2.split(";");
+                    body = "'" + row[0] + "',"
+                            + (row[1].equals("") ? "''," : "to_timestamp('" + row[1] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + (row[2].equals("") ? "''," : "to_timestamp('" + row[2] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + "'" + row[3] + "',"
+                            + "'" + row[4] + "'";
+                }
+                insert = "Insert into REGULATION_DICTIONARY (" + generateHeader(records) + ")" + " values (" + body + ")";
+                System.out.println(insert);
+                writer.write(insert + ";\n");
+            }
+            status = "\nOk\n";
+
+        } else {
+            status = "\nчто-то пошло не так\n";
+        }
+
+        System.out.println(status);
+    }
+
+    public void generateTaskDictionary (List<List<String>> records, Writer writer) throws IOException {
+
+        body = "";
+        insert = "";
+        if (records.size() > 0) {
+            for (int i = 1; i < records.size(); i++) {
+                for (String s2 : records.get(i)) {
+                    String[] row;
+                    row = s2.split(";");
+                    body = "'" + row[0] + "',"
+                            + (row[1].equals("") ? "''," : "to_timestamp('" + row[1] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + (row[2].equals("") ? "''," : "to_timestamp('" + row[2] + "', 'DD.MM.RR HH24:MI:SSXFF'),")
+                            + "'" + row[3] + "'";
+                }
+                insert = "Insert into TASK_DICTIONARY (" + generateHeader(records) + ")" + " values (" + body + ")";
                 System.out.println(insert);
                 writer.write(insert + ";\n");
             }
